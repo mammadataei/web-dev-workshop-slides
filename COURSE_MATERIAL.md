@@ -243,17 +243,30 @@ Paste this into your Socratic AI Tutor:
 
 ---
 
-### Session 2: Semantic HTML5 & The DOM Tree Architecture
+### Session 2: Semantic HTML5, DOM Tree Architecture & Strategic AI
 
 #### 1. Objectives & Time Allocation (2 Hours)
-- Understand the DOM tree as a parent-child hierarchy (Russian nesting dolls).
-- Replace non-semantic `<div>` soup with landmark HTML5 elements.
-- Understand tags, attributes (`href`, `src`, `alt`), and content.
-- Inspect the live DOM tree in Browser DevTools Elements tab.
+- Understand HTML syntax, tag anatomy, attributes (`href`, `src`, `alt`), and document skeleton (`<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`).
+- Understand the DOM tree as a parent-child hierarchy (Russian nesting dolls) and visualize element flow (Block vs. Inline).
+- Replace non-semantic `<div>` soup with landmark HTML5 elements (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`).
+- Learn the **4-Stage AI Learning Curve** for beginners and adopt the **3-Point AI HTML Audit** to critically evaluate AI-generated code.
+- Inspect and navigate the live DOM tree in Browser DevTools Elements tab using keyboard navigation.
 
 #### 2. Concept & Mental Models (45 min)
 
-##### The Russian Nesting Dolls Metaphor (DOM Hierarchy)
+##### 1. The Anatomy of an HTML Document & Syntax
+HTML (HyperText Markup Language) defines the structure and meaning of web content. It is a document markup language, not a programming language:
+- **Tags & Elements**: `<p class="lead">Hello World</p>`
+  - `<p>` is the opening tag.
+  - `class="lead"` is an attribute (name-value pair modifying the element).
+  - `Hello World` is the text content.
+  - `</p>` is the closing tag.
+- **Void (Self-Closing) Elements**: Elements that cannot contain child content do not require closing tags in HTML5: `<img>`, `<input>`, `<br>`, `<meta>`.
+- **Head vs. Body Boundary**:
+  - `<head>`: Invisible metadata, character encoding (`<meta charset="UTF-8">`), responsive viewport configuration, external stylesheets, and document `<title>`.
+  - `<body>`: Everything rendered visually on screen.
+
+##### 2. The Russian Nesting Dolls Metaphor (DOM Hierarchy)
 HTML elements are containers that sit inside other containers:
 ```
 +-----------------------------------------------------------+
@@ -272,52 +285,126 @@ HTML elements are containers that sit inside other containers:
 |   +-----------------------------------------------------+ |
 +-----------------------------------------------------------+
 ```
-If you close a parent tag before closing its child tag, the browser tries to fix it automatically, which creates unpredictable rendering bugs.
+If you close a parent tag before closing its child tag, the browser attempts error correction automatically, producing unpredictable rendering anomalies and layout bugs.
 
-##### Why Semantic Tags Matter in the AI Era
-AI code generators frequently output non-semantic code ("`<div>` soup"):
-```html
-<!-- BAD: Non-semantic div soup -->
-<div class="header">
-  <div class="nav-button">Home</div>
-</div>
+##### 3. Block vs. Inline Flow
+- **Block Elements** (`<h1>`–`<h6>`, `<p>`, `<div>`, `<header>`, `<article>`): Start on a new line and stretch horizontally to fill 100% of the parent width.
+- **Inline Elements** (`<a>`, `<span>`, `<strong>`, `<em>`): Flow alongside neighboring text, taking only the width required by their content.
+- *Rule of Thumb*: Never nest a block-level container inside an inline element unless explicitly structuring an accessible link wrapper in HTML5.
 
-<!-- GOOD: Semantic HTML5 -->
-<header>
-  <nav>
-    <a href="/">Home</a>
-  </nav>
-</header>
+##### 4. Core Semantic Landmarks to Master
+- `<header>`: Introductory branding, navigation container, or site banner.
+- `<nav>`: Primary navigation menus containing structured lists (`<ul>` / `<li>`) of hyperlinks.
+- `<main>`: The central, unique content of the page (strictly **one** `<main>` per document).
+- `<section>`: A thematic grouping of content, typically introduced with a heading (`<h2>`–`<h6>`).
+- `<article>`: A self-contained, independently distributable composition (e.g., product card, blog post, review).
+- `<footer>`: Closing section containing copyright, legal disclosures, and supplementary links.
+- `<aside>`: Tangentially related content (sidebars, callout boxes, related article lists).
+
+##### 5. The Golden Interaction Rule: `<button>` vs. `<a>`
+- Use `<a>` (anchor) when **navigating to a new location or URL** (`href="/profile"`).
+- Use `<button>` when **triggering an in-page action** (opening a modal, submitting a form, toggling a menu).
+- *Why this matters*: Screen readers announce buttons as actionable controls. Buttons inherently support keyboard activation via `Enter` and `Spacebar`, whereas `<div onclick>` is completely invisible and unreachable to keyboard-only and assistive-technology users.
+
+##### 6. HTML Forms & The `<label>` Accessibility Contract
+Forms are the primary mechanism for collecting user input and transmitting data to web servers:
+- **The `<form>` Container**:
+  - Encapsulates input controls and defines where data goes (`action="/api/register"`) and how (`method="POST"` or `GET`).
+  - Supports native `Enter`-key form submission when focused on any input field.
+- **The `<label for="...">` Contract**:
+  - Always pair each `<input id="x">` with a `<label for="x">`.
+  - *Usability*: Clicking the label text automatically focuses the input field or toggles a checkbox/radio button (drastically expands touch targets for mobile users).
+  - *Accessibility*: Assistive screen readers announce the label text when the user tabs into the field.
+  - *Anti-Pattern*: Never substitute `placeholder="..."` for `<label>`. Placeholders disappear as soon as the user types, suffer from low contrast, and are frequently skipped by screen readers.
+- **Core Input Types**:
+  - Textual: `<input type="text">`, `<input type="email">`, `<input type="password">`, `<textarea>`
+  - Choices: `<input type="checkbox">`, `<input type="radio">` (grouped by shared `name`), `<select>` with `<option>`
+  - Submit Control: `<button type="submit">Submit</button>` vs. `<button type="button">Action</button>`
+
+##### 7. HTML Tables & Tabular Data Architecture
+Tables are designed specifically to display two-dimensional tabular data (schedules, matrices, financial rows, comparisons):
+- **`<table>`**: The root container for structured tabular datasets.
+- **`<caption>`**: The accessible title of the table, placed as the immediate first child. Read aloud by screen readers so users understand the table's purpose before navigating rows.
+- **`<thead>`, `<tbody>`, `<tfoot>`**: Structural segment containers separating header columns, data rows, and summary totals.
+- **`<tr>`**: Table row.
+- **`<th>` (Header Cell)**: Column or row header. Must include `scope="col"` (for column headers) or `scope="row"` (for row headers) so assistive tech can associate data cells with headers.
+- **`<td>` (Data Cell)**: Standard data cell.
+- **The Cardinal Rule**: *Tables are strictly for tabular data, NEVER for layout!* Using tables for page layout breaks mobile responsiveness, destroys accessibility, and creates unmaintainable HTML.
+
+##### 8. The 4-Stage Beginner AI Curve
+To avoid blank-canvas paralysis and avoid producing unmaintainable code, students learn to use AI along a disciplined 4-stage adoption curve:
 ```
-Semantic tags tell screen readers (accessibility), search engines (SEO), and browsers what the content *means*, not just how it looks.
+[Stage 1: AI as Socratic Tutor]
+Ask AI to explain concepts, demystify errors, and quiz you. Do NOT ask it to write the lab.
 
-##### Core Landmarks to Master
-- `<header>`: Introductory content or site-wide banner.
-- `<nav>`: Primary navigation links.
-- `<main>`: The unique core content of the document (only one per page).
-- `<section>`: A thematic grouping of content with a heading.
-- `<article>`: An independent, self-contained piece of content (e.g., a card, blog post).
-- `<footer>`: Closing content, copyright, and secondary links.
-- `<button>` vs. `<a>`:
-  - Use `<a>` (anchor) when **navigating to a new URL**.
-  - Use `<button>` when **triggering an action** (opening a menu, submitting data).
+[Stage 2: Mental Model First, Generation Second]
+Never generate code you cannot mentally parse line-by-line. If you can't trace the DOM tree,
+you cannot maintain the project.
 
-#### 3. 10-Minute Syntax & Concept Drill
-**Parsons Problem: Fix the Broken Nesting**
-Re-order and close the tags so the nesting is valid:
-```html
-<!-- Given broken snippet: -->
-<main>
-  <article>
-    <h2>Understanding the DOM</h2>
-    <p>The DOM is an object tree.
-  </main>
-</article>
+[Stage 3: The 3-Point AI Output Audit]
+Every time an AI model outputs HTML, run the 3-Point Audit before copying it into your project.
+
+[Stage 4: Technical Specification Prompting]
+Prompt using precise semantic tags, attribute constraints, and accessibility rules rather than vague wishes.
 ```
-*(Solution: Ensure `<p>` is closed with `</p>`, followed by `</article>`, and finally `</main>`)*.
+
+##### 9. The 3-Point AI HTML Audit Checklist
+AI models trained on legacy web code frequently generate obsolete patterns. Before accepting AI-generated HTML, verify:
+1. **The Landmark Check**: Did the AI generate generic `<div class="...">` containers instead of `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, or `<form>`?
+2. **The Interaction Check**: Did the AI output `<div onclick="...">` or `<a href="#">` for an action, instead of a semantic `<button type="button">` or `<button type="submit">`?
+3. **The Attribute Check**: Did the AI omit `alt` attributes on `<img>` tags or fail to pair form inputs with explicit `<label for="...">` tags?
+
+#### 3. 10-Minute Syntax & Concept Drills
+- **Drill A (Parsons Problem: Fix the Broken Nesting)**:
+  ```html
+  <!-- Given broken snippet: -->
+  <main>
+    <article>
+      <h2>Understanding the DOM</h2>
+      <p>The DOM is an object tree.
+    </main>
+  </article>
+  ```
+  *(Solution: Close `<p>` with `</p>`, then `</article>`, then `</main>`)*.
+- **Drill B (AI Code Smell Spotting)**:
+  Identify the 3 fatal flaws in this AI snippet:
+  `<div class="btn" onclick="save()">Save</div>`
+  *(Flaws: 1. Non-semantic div, 2. No keyboard accessibility [no Enter/Space trigger], 3. Missing `type="button"` and ARIA role)*.
 
 #### 4. Hands-on Lab: Refactoring "Div Soup" into Semantic HTML5 (55 min)
-1. In your project, create `semantic.html`.
+
+##### 4.1 Learning Example: Partnering with AI to Refactor (10 min)
+Before students begin their independent refactoring, study this step-by-step case study modeling the professional AI workflow:
+1. **The Scenario (Flawed Legacy Component)**:
+   Notice this typical unsemantic newsletter widget:
+   ```html
+   <div class="newsletter-card">
+     <div class="heading">Subscribe to updates</div>
+     <div class="input-row">
+       <input placeholder="Your email here">
+     </div>
+     <div class="btn" onclick="send()">Subscribe</div>
+   </div>
+   ```
+2. **The Technical Specification Prompt**:
+   How a developer prompts AI with architectural constraints:
+   ```
+   "Refactor this legacy component into accessible Semantic HTML5:
+   1. Wrap in a <form> with a <button type="submit">.
+   2. Pair the input with an explicit <label for="email">.
+   3. Ensure it passes Tab keyboard navigation.
+   Explain the 3 main improvements you made."
+   ```
+3. **The Live 60-Second Audit**:
+   Critique the AI output line-by-line:
+   - Verify the `<form>` wrapper and `<button type="submit">`.
+   - Confirm that `<label for="email">` matches `<input id="email">`.
+   - Test clicking the label to verify that the text box gains focus automatically!
+4. **DevTools Verification**:
+   Open Chrome DevTools, navigate the DOM tree, and verify the Accessibility tree.
+
+##### 4.2 Student Hands-on Challenge: Div Soup Surgery (45 min)
+1. In your project workspace, create `semantic.html`.
 2. Inspect this typical AI-generated code containing zero semantic meaning:
 ```html
 <div class="top-bar">
@@ -341,13 +428,72 @@ Re-order and close the tags so the nesting is valid:
    - Convert `.links` to `<nav>` with `<ul>` and `<li>` containing `<a href="...">`.
    - Convert `.content` to `<main>`.
    - Convert `.card` to `<article>`.
-   - Add missing `alt` attributes to images.
+   - Add descriptive `alt` attributes to images (e.g., `alt="Course instructor profile avatar"`).
    - Convert `.btn` to a real `<button type="button">`.
-4. Open the page in Chrome, open **DevTools Elements tab**, and navigate the DOM tree using arrow keys.
+4. Open the page in Chrome, open **DevTools Elements tab**, and navigate the DOM tree using arrow keys (`Left`/`Right` to collapse/expand nodes).
+5. Open the **Accessibility** pane in Chrome DevTools Elements tab to verify that landmarks and buttons expose correct ARIA roles.
 
-#### 5. AI Tutor Challenge (10 min)
-Prompt your AI tutor:
-> *"Why does a screen reader or a keyboard-only user struggle when a developer uses `<div onclick="...">` instead of `<button>`? Explain in 3 simple sentences."*
+#### 5. AI Tutor Challenge & Reflection (10 min)
+Prompt your AI tutor using the Socratic prompt:
+> *"Why does a screen reader or a keyboard-only user struggle when a developer uses `<div onclick="...">` instead of `<button>`? Explain in 3 simple sentences using the doorman metaphor."*
+
+#### 6. Homework 1: The Accessible Event Showcase Card
+Build a standalone HTML document (`event.html`) representing an upcoming tech conference, workshop, or concert:
+1. **Document Skeleton**:
+   - Proper `<!DOCTYPE html>`, `<html lang="en">`, `<head>` with UTF-8 charset, responsive viewport `<meta>`, and descriptive `<title>`.
+2. **Semantic Header & Navigation**:
+   - `<header>` with site/event name (`<h1>` or `<h2>`) and `<nav>` with an unordered list (`<ul>`) of links (`<a href>`) to "Schedule", "Speakers", and "Venue".
+3. **Core Landmark & Event Card**:
+   - `<main>` container enclosing an `<article class="event-card">`.
+   - Event poster image (`<img>`) with a descriptive `alt` attribute.
+   - Event title (`<h2>`), date/time paragraph (`<p>`), and venue description.
+   - A real `<button type="button">` for "Register Now / RSVP" (no fake `<div onclick>`!).
+4. **Footer**:
+   - `<footer>` with copyright information and an email contact link (`<a href="mailto:...">`).
+5. **Pragmatic AI Task**:
+   - Prompt your AI assistant to generate 3 realistic workshop schedule items using the Spec Prompt format.
+   - Run the 3-Point Audit on the AI response: inspect whether it used `<li>` or generic `<div>` tags, fix any flaws, and embed the clean HTML into your file.
+   - **Verification**: Open `event.html` in Chrome, press `Tab` to verify keyboard focus reaches all links and the button, and test pressing `Enter`/`Space` on the button.
+
+#### 7. Homework 2: Conference Registration & Schedule Portal (portal.html)
+Create a single HTML document named `portal.html`. Your mission is to build a complete developer conference portal that integrates an accessible user registration form and a structured schedule and pricing table.
+
+##### 1. Project Requirements & Deliverables
+
+**Part A: The Interactive Registration Form (`<form>`)**:
+- Encapsulated in a semantic `<form action="/register" method="POST">`.
+- **Personal Details**:
+  - Full Name: `<input type="text" id="full-name" name="name" required>` paired with an explicit `<label for="full-name">`.
+  - Email Address: `<input type="email" id="user-email" name="email" required>` paired with `<label for="user-email">`.
+- **Ticket / Track Selection**:
+  - Workshop Track: `<select id="track-select" name="track">` with multiple `<option>` elements (e.g. Frontend Foundations, Full-Stack Mastery, AI Engineering).
+  - Attendance Mode: A pair of radio buttons (`<input type="radio" name="mode">`) for "In-Person Attendance" and "Virtual Live Stream".
+- **Special Requirements**:
+  - Accessibility & Dietary Notes: `<textarea id="notes" name="notes">` with paired `<label for="notes">`.
+- **Mandatory Consent & Submission**:
+  - Code of Conduct agreement: `<label for="terms"><input type="checkbox" id="terms" required> I agree to the code of conduct</label>`.
+  - Real submit button: `<button type="submit">Complete Registration</button>`.
+
+**Part B: The Workshop Schedule & Pricing Table (`<table>`)**:
+- A semantic data table displaying the event matrix:
+  - Accessible `<caption>Workshop Schedule & Track Pricing Matrix</caption>`.
+  - `<thead>` defining column headers with `<th scope="col">Time</th>`, `<th scope="col">Session Topic</th>`, `<th scope="col">Room</th>`, `<th scope="col">Instructor</th>`, and `<th scope="col">Pricing</th>`.
+  - `<tbody>` containing at least 4 session rows (`<tr>`), using `<th scope="row">` for time slots and `<td>` for cell data.
+  - `<tfoot>` summarizing total workshop hours and perks (e.g., `<td colspan="5">All in-person tickets include breakfast and workshop materials</td>`).
+
+##### 2. Pragmatic AI Workflow for Homework 2
+1. **Mock Data Generation Prompt**:
+   Interrogate your AI assistant to produce the dataset for your table:
+   > *"Generate an accessible HTML5 table for a 4-session tech workshop. Columns: Time, Topic, Room, Instructor, and Price. Include a <caption>, <thead>, <tbody>, <tfoot>, and proper <th scope='col'> and <th scope='row'> attributes. Do not use generic divs."*
+2. **The 60-Second Code Audit**:
+   Inspect the AI response before adding it to `portal.html`:
+   - Did the AI include `<caption>`?
+   - Did it correctly assign `scope="col"` to column headers?
+   - Did it avoid using layout `<div>` containers inside `<table>`?
+3. **Form Crafting & Browser Verification**:
+   Hand-code the `<form>` section, open `portal.html` in Chrome, and test:
+   - Click each `<label>` text on screen: verify that the corresponding input gains focus or toggles.
+   - Press `Tab` repeatedly to ensure logical keyboard navigation order throughout the page.
 
 ---
 
