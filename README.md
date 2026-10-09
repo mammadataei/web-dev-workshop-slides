@@ -7,10 +7,11 @@ Homework assignments: [`homework/`](./homework/README.md).
 
 ## Decks
 
-| Deck                                | Title                               | Status  |
-| ----------------------------------- | ----------------------------------- | ------- |
-| `slides/session-01/`                | Session 01: How the Web Works       | Done    |
-| `slides/session-02/` … `session-14` | See roadmap in `COURSE_MATERIAL.md` | Planned |
+| Deck | Title | Status |
+| --- | --- | --- |
+| `slides/session-01/` | Session 01: How the Web Works | Done |
+| `slides/session-02/` | Session 02: Semantic HTML5, DOM Architecture & Pragmatic AI Workflows | Done |
+| `slides/session-03/` … `session-14` | See roadmap in `COURSE_MATERIAL.md` | Planned |
 
 ## Run
 
