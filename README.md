@@ -2,7 +2,9 @@
 
 Slide decks for **Web Development Fundamentals in the AI Era** — a 14-session / 28-hour course.
 
-Course syllabus and session plans: [`COURSE_MATERIAL.md`](./COURSE_MATERIAL.md).
+Course syllabus and session plans: [`COURSE_MATERIAL.md`](./COURSE_MATERIAL.md).  
+Homework assignments: [`homework/`](./homework/README.md).
+
 
 ## Decks
 
