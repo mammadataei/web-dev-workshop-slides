@@ -12,7 +12,8 @@
   "dependencies": {
     "@open-slide/core": "^2.0.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "vercel": "^64.5.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

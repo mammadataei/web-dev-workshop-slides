@@ -119,7 +119,7 @@ Whenever new syntax is introduced, students are never presented with an empty co
 |   Session 4: Modern Layouts with Flexbox, Responsive Design & CSS Wrap-up     |
 +-------------------------------------------------------------------------------+
 | PHASE 2: JAVASCRIPT FUNDAMENTALS & DYNAMIC ACTIONS (Sessions 5–9)             |
-|   Session 5: JavaScript Core Mental Model & Browser Memory                    |
+|   Session 5: JavaScript Foundations: Engines, Modern Runtimes & Memory Mechanics |
 |   Session 6: Essential Data Structures: Objects & Arrays                      |
 |   Session 7: The Bridge: DOM Querying & Dynamic Updates                       |
 |   Session 8: Event-Driven Programming: Clicks, Inputs & State                 |
@@ -889,38 +889,83 @@ Prompt your AI tutor:
 
 ---
 
-### Session 5: JavaScript Core Mental Model & Browser Memory
+### Session 5: JavaScript Foundations: Engines, Modern Runtimes & Memory Mechanics
 
 #### 1. Objectives & Time Allocation (2 Hours)
-- Understand the role of JavaScript: changing state and reacting to actions.
-- Demystify browser memory vs. code files.
-- Master variables (`const` vs. `let`), primitive types (string, number, boolean).
-- Use `console.log()` as the primary inspection tool.
+- Understand the Web Trinity (HTML Skeleton, CSS Skin, JavaScript Brain & Behavior) and brief origins (Netscape, ECMAScript, ES6).
+- Understand JavaScript Engines (Google V8, Apple JavaScriptCore) vs. Runtimes (Browser Web APIs vs. Node.js & Bun Server APIs).
+- Master the Developer Cockpit: Running code in Browser DevTools Console, `<script defer>` in HTML `<head>`, and Terminal CLI (`node` / `bun`).
+- Demystify computer RAM (live volatile memory) vs. code files on disk (inert storage text).
+- Master variables (`const` by default vs. `let`), naming conventions (camelCase), and why `var` is legacy.
+- Master the 7 primitive data types (`number`, `string` with template literals, `boolean`, `undefined`, `null`, `bigint`, `symbol`) and the `typeof` operator (including the 1995 `typeof null` quirk).
+- Use `console.log()` as the primary inspection and diagnostic tool.
 
 #### 2. Concept & Mental Models (45 min)
 
-##### What JavaScript Actually Does
-HTML creates the structure (the house). CSS provides the styling (the paint). JavaScript provides the electrical wiring (turning lights on/off, opening doors):
-```
-Static Page (HTML/CSS) + State / User Action -> Dynamic Page (JavaScript)
-```
+##### 1. The Web Trinity: Structure, Style & Brain
+Connecting Sessions 1–4 to Phase 2:
+- **HTML5 (Structure):** The skeleton and blueprint. Defines tags and elements in document hierarchy. Inert without scripts.
+- **CSS3 (Presentation):** The skin and aesthetic layer. Box model, Flexbox, colors, and responsive layout.
+- **JavaScript (Behavior & Action):** The brain and muscles. Allocates state in RAM, reacts to user events (clicks, keystrokes), and mutates HTML/CSS dynamically.
 
-##### Browser Memory vs. Files
-- An HTML file sits on your disk or server as inert text.
-- When loaded, JavaScript allocates temporary storage in the computer's **RAM (Memory)**.
-- If you reload the page, memory is wiped clean and re-created from scratch.
+##### 2. A Brief History: From 10 Days to Global Ubiquity
+- **1995:** Brendan Eich creates Mocha in 10 days at Netscape Navigator. Renamed LiveScript, then JavaScript (a marketing tie-in with Java, though the two languages are completely unrelated).
+- **1997:** Standardized under **ECMA-262 (ECMAScript)** to prevent proprietary browser fragmentation. JavaScript is the implementation dialect.
+- **2015 (ES6 / ES2015):** The modern renaissance of JavaScript, introducing `const`, `let`, template literals, arrow functions, and modular architecture.
 
-##### Storing Data in Memory: Labeled Boxes
-- `const` (Constant): A locked box. The label cannot be moved to a different box. **Default to `const`**.
-- `let`: An unlocked box. The value inside can be replaced later. Use only when a value *must* change (e.g., counters).
-- *Never use `var`* (an obsolete keyword with confusing scoping rules).
+##### 3. JavaScript Engines: The CPU Translation Layer
+A JavaScript Engine is a low-level program (written in C++ or Rust) that executes JavaScript source code by translating it into CPU machine instructions.
+- The engine only implements the **ECMAScript language specification** (variables, loops, conditionals, functions). It has *no concept* of an HTML tag or a browser window!
+- **The Big Three Engines:**
+  - **Google V8 (C++):** Powers Google Chrome, Microsoft Edge, Brave, and Node.js.
+  - **Apple JavaScriptCore / JSC (C++):** Powers Safari, iOS WebViews, and **Bun**.
+  - **Mozilla SpiderMonkey (C++/Rust):** The original engine created in 1995, powers Firefox.
 
-```javascript
-// Primitive Data Types:
-const studentName = "Amina";       // String (Text in quotes)
-const studentAge = 21;             // Number (Raw numeric value)
-const isEnrolled = true;           // Boolean (true or false)
-```
+##### 4. Engine vs. Runtime: Where Does JS Actually Live?
+$$\text{Runtime} = \text{Engine} + \text{Host Environment APIs}$$
+- **The Engine** provides syntax grammar and arithmetic calculation.
+- **The Runtime** provides environment superpowers:
+  - **Browser Runtime:** Wraps the engine with **Web APIs** (`document` for DOM manipulation, `window`, `fetch()` for network calls, `localStorage`, `setTimeout`).
+  - **Server Runtimes (Node.js & Bun):** Wraps the engine with **System APIs** (file system `node:fs`, HTTP server sockets, OS processes).
+  - *Why `document` throws a `ReferenceError` in Node/Bun:* The DOM is a Browser Web API, not part of the core JS engine!
+
+##### 5. Modern Server Runtimes: Node.js vs. Bun
+- **Node.js (2009 by Ryan Dahl):** Extracted V8 from Chrome and added C++ system bindings. Allowed JavaScript to run on servers, powering backends, APIs, and CLI tooling.
+- **Bun (2022+ by Jarred Sumner):** Written from scratch in Zig using Apple's JavaScriptCore (JSC). Built as an all-in-one drop-in Node replacement: blazing-fast runtime, instant package manager (`bun install`), and native TypeScript support without configuration.
+
+##### 6. The Developer Cockpit: 3 Ways to Run JavaScript
+1. **Browser DevTools Console (`Cmd + Option + J` / `F12`):** Instant scratchpad REPL for quick tests and inspection.
+2. **HTML `<script>` tag (`<script src="app.js" defer></script>`):** Linked in `<head>` with `defer` so it downloads in the background and executes safely after the DOM is constructed.
+3. **Terminal CLI (`node app.js` or `bun run app.js`):** Direct OS execution for backend logic and scripts.
+
+##### 7. Browser Memory (RAM) vs. Files on Disk
+- An HTML/JS file on your disk sits as inert, static text characters.
+- When executed, JavaScript allocates live electronic storage slots in the computer's **RAM (Memory)**.
+- **The Refresh Rule:** If you reload the browser tab, memory is wiped completely clean and recreated from scratch!
+
+##### 8. Storing Data in Memory: The Labeled Box Metaphor
+- A variable is a labeled cardboard box at an address in RAM.
+- **Identifier:** The label on the box (`const studentName`).
+- **Value:** The data placed inside the box (`"Amina"`).
+- **Declaration Rules (The Production Standard):**
+  - **`const` (Locked Box):** Default to `const` for 95% of variables. Protects against accidental reassignment.
+  - **`let` (Unlocked Box):** Use only when a value *must* be reassigned (counters, toggles).
+  - **`var` (The Legacy Bug Hazard):** Obsolete since 2015. Function-scoped, hoisting pitfalls. *Never write `var` in modern code.*
+- **`TypeError: Assignment to constant variable`:** Thrown when attempting to overwrite a `const` box.
+
+##### 9. The 7 Primitive Data Types
+JavaScript is **dynamically typed**: types belong to values, not the variable declarations.
+1. **`number`:** 64-bit float format (`42`, `3.14`, `NaN`, `Infinity`). No separate integer type.
+2. **`string`:** Text in quotes (`"..."`, `'...'`) or modern backtick template literals (`` `Hello ${studentName}` ``).
+3. **`boolean`:** Binary truth values (`true` or `false`).
+4. **`undefined`:** System default: a variable box exists, but no value has been placed in it yet ("JS says: I don't know").
+5. **`null`:** Developer choice: intentional absence of any value ("Developer says: this is empty on purpose").
+6. **`bigint`:** Arbitrary-precision large integers (`9007199254740991n`).
+7. **`symbol`:** Unique immutable identifiers (`Symbol("id")`).
+
+##### 10. The `typeof` Operator & The Historical 1995 Quirk
+- Inspect any value: `typeof 42 === "number"`, `typeof "hi" === "string"`, `typeof true === "boolean"`.
+- **The 1995 Bug:** `typeof null === "object"`. In the original 1995 engine, values had a 3-bit type tag (`000` for objects). `null` was stored as a NULL pointer (`0x00`), mistakenly tagging it as an object. It was never changed to avoid breaking legacy websites. `null` is a primitive!
 
 #### 3. 10-Minute Syntax & Concept Drill
 **Fill in the blanks with `const` or `let`, and identify the data type:**
@@ -943,17 +988,17 @@ ______ isLoggedIn = false;        // Data type: __________
 const courseName = "Web Fundamentals";
 let attendees = 25;
 console.log(courseName);
-console.log("Attendees count:", attendees);
+console.log(`Attendees count: ${attendees}`);
 
 attendees = attendees + 1;
-console.log("Updated attendees:", attendees);
+console.log(`Updated attendees: ${attendees}`);
 ```
 3. Intentionally trigger errors to learn how to read browser diagnostics:
    - Type: `courseName = "Advanced Web";`
    - Observe the error: `TypeError: Assignment to constant variable.`
    - Type: `console.log(nonExistentVar);`
    - Observe the error: `ReferenceError: nonExistentVar is not defined.`
-4. Create a local `script.js`, link it via `<script src="script.js" defer></script>`, and log personalized variables.
+4. Create a local `index.html` and `script.js`, link it via `<script src="script.js" defer></script>`, and log personalized variables.
 
 #### 5. AI Tutor Challenge (10 min)
 Prompt your AI tutor:
