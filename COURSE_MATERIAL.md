@@ -120,7 +120,7 @@ Whenever new syntax is introduced, students are never presented with an empty co
 +-------------------------------------------------------------------------------+
 | PHASE 2: JAVASCRIPT FUNDAMENTALS & DYNAMIC ACTIONS (Sessions 5–9)             |
 |   Session 5: JavaScript Foundations: Engines, Modern Runtimes & Memory Mechanics |
-|   Session 6: Essential Data Structures: Objects & Arrays                      |
+|   Session 6: Non-Primitives, Memory References & Control Flow                 |
 |   Session 7: The Bridge: DOM Querying & Dynamic Updates                       |
 |   Session 8: Event-Driven Programming: Clicks, Inputs & State                 |
 |   Session 9: Array Iteration & Dynamic Card Rendering                        |
@@ -1006,100 +1006,287 @@ Prompt your AI tutor:
 
 ---
 
-### Session 6: Essential Data Structures: Objects & Arrays
+### Session 6: Non-Primitives, Memory References & Control Flow
 
 #### 1. Objectives & Time Allocation (2 Hours)
-- Master Objects using the **Contact Card** metaphor (labeled key-value pairs).
-- Master Arrays using the **Ice Cube Tray** metaphor (ordered numbered slots).
-- Access, read, and modify data using dot notation and zero-based indexing.
-- Combine objects and arrays to model real-world web data (e-commerce products, user profiles).
+- Master the **Computer Memory Split**: Fast, fixed-size **Stack** (primitives and pointer addresses) vs. dynamic, expandable **Heap** (objects, arrays).
+- Demystify **Copy by Value** (primitives clone independently) vs. **Copy by Reference** (non-primitives share the same memory pointer).
+- Solve the `const` mutability paradox: Why `const` locks variable reassignment on the Stack, but allows property mutations in the Heap.
+- Master what it means to **"restore or reassign a reference"** versus mutating shared data, and why `{} === {}` evaluates to `false`.
+- Master all foundational **JavaScript Operators**: Arithmetic, Strict Equality (`===`) vs. Loose Equality (`==`), Logical operators (`&&`, `||`, `!`) with short-circuiting, and the Ternary Operator (`? :`).
+- Build rock-solid **Control Flow**: Conditionals (`if`, `else if`, `else`, `switch`), understanding the **8 Falsy Values**, and refactoring nested "Pyramid of Doom" code into flat **Guard Clauses**.
+- Master **Iteration Mechanics**: The classic `for` loop anatomy, `while` / `do...while`, loop control (`break` vs. `continue`), and modern traversal (`for...of` for arrays, `Object.entries()` for objects).
+- Deepen data modeling with **Objects** (the Contact Card metaphor) and **Arrays** (the Ice Cube Tray metaphor), culminating in real-world **Arrays of Objects** (e-commerce catalogs).
+- *(Note: Functions as reusable callable machines will be explored in Session 07 along with the live DOM Bridge).*
 
-#### 2. Concept & Mental Models (45 min)
+#### 2. Concept & Mental Models (50 min)
 
-##### The Object: A Contact Card
-An Object is a single item with labeled properties (`key: value`):
+##### 1. The Memory Architecture: Stack vs. Heap
+In computer RAM, the JavaScript engine manages two distinct memory spaces:
 ```
-+------------------------------------+
-| CONTACT CARD (Object)              |
-| name:    "Carlos"                  |
-| role:    "Student"                 |
-| credits: 15                        |
-+------------------------------------+
++-------------------------------------------------------------+
+|                     COMPUTER RAM (MEMORY)                   |
+|                                                             |
+|  THE CALL STACK (Fast, Fixed Size)   THE HEAP (Dynamic)     |
+|  +------------------------------+   +--------------------+  |
+|  | [age: 25]                    |   | #0x7A4F:           |  |
+|  | [isLoggedIn: true]           |   | {                  |  |
+|  | [userName: "Amina"]          |   |   title: "Book",   |  |
+|  |                              |   |   price: 29.99     |  |
+|  | [cartPtr: #0x7A4F] --------->|   | }                  |  |
+|  +------------------------------+   +--------------------+  |
++-------------------------------------------------------------+
 ```
-In JavaScript:
+- **The Stack:** Stores primitive values (`number`, `string`, `boolean`, `null`, `undefined`, `symbol`, `bigint`) directly in the variable's allocated memory slot.
+- **The Heap:** A large, unstructured region of memory where dynamic, multi-property non-primitives (`Object`, `Array`) reside.
+- **The Pointer / Reference:** When an object or array is created, the variable on the Stack does *not* contain the object itself; it stores a **memory address (pointer)** referencing the object's location in the Heap!
+
+##### 2. Copy by Value vs. Copy by Reference
+When assigning one variable to another, JavaScript behaves fundamentally differently depending on whether the data is primitive or non-primitive:
+
+**A. Primitives: Copy by Value (Independent Clones)**
 ```javascript
-const student = {
-  name: "Carlos",
-  role: "Student",
-  credits: 15
-};
+let scoreA = 100;
+let scoreB = scoreA; // A brand-new copy of 100 is placed in scoreB's stack slot
 
-// Accessing properties via dot notation:
-console.log(student.name);    // "Carlos"
-console.log(student.credits); // 15
-```
+scoreB = 85;
 
-##### The Array: An Ice Cube Tray
-An Array is a numbered list of items. Each slot has an index starting at **0**:
+console.log(scoreA); // 100 (Unchanged!)
+console.log(scoreB); // 85
 ```
-+-------------+-------------+-------------+-------------+
-|   Slot 0    |   Slot 1    |   Slot 2    |   Slot 3    |
-|   "Apple"   |  "Banana"   |  "Cherry"   |   "Date"    |
-+-------------+-------------+-------------+-------------+
-```
-In JavaScript:
+Each variable holds its own independent value. Modifying `scoreB` has zero effect on `scoreA`.
+
+**B. Non-Primitives: Copy by Reference (Shared Pointers)**
 ```javascript
-const fruits = ["Apple", "Banana", "Cherry", "Date"];
+const userA = { name: "Sara", credits: 50 };
+const userB = userA; // Only the memory address (#0x7A4F) is copied!
 
-console.log(fruits[0]); // "Apple"
-console.log(fruits[2]); // "Cherry"
-console.log(fruits.length); // 4
+userB.credits = 99; // Mutates the object at #0x7A4F in the Heap
+
+console.log(userA.credits); // 99 (MUTATED! Both variables point to the SAME object)
 ```
 
-##### Modeling Real-World Web Data
-Every modern website (Netflix, Spotify, Amazon) is an array of objects:
+##### 3. The Reference Mutation Trap & What "Restoring a Reference" Means
+A notorious beginner trap in web engineering is passing an object or array to another part of the application and mutating it, unintentionally breaking the original state.
+- **Reassignment (Breaking the Pointer):**
+  ```javascript
+  let activeUser = { id: 1, name: "Ali" };
+  const backupRef = activeUser; // Both point to #0x111
+
+  // Reassigning activeUser gives it a NEW pointer address (#0x222)
+  activeUser = { id: 2, name: "Zahra" };
+
+  console.log(activeUser.name); // "Zahra" (#0x222)
+  console.log(backupRef.name);  // "Ali"   (#0x111 still exists!)
+  ```
+- **"Restoring a Reference":**
+  Restoring a reference means pointing a variable back to a previously cached memory address (`activeUser = backupRef;`).
+- **Safe Cloning (Breaking the Link):**
+  To create a genuinely independent copy so that modifications do not corrupt original state, use the spread operator (`{ ...original }`, `[...original]`):
+  ```javascript
+  const original = { name: "Carlos", level: 1 };
+  const safeCopy = { ...original }; // New object in heap with copied top-level properties
+  safeCopy.level = 2;
+  console.log(original.level); // 1 (Safe!)
+  ```
+
+##### 4. The `const` Mutability Paradox
+Students frequently ask: *"Why does `const` throw an error when I reassign it, but allows me to add or change properties on an object?"*
 ```javascript
-const courseCatalog = [
-  { id: 101, title: "HTML Basics", durationHours: 4 },
-  { id: 102, title: "CSS Mastery", durationHours: 6 },
-  { id: 103, title: "JS Logic",    durationHours: 8 }
-];
+const player = { level: 1 };
 
-console.log(courseCatalog[1].title); // "CSS Mastery"
+player.level = 2; // ALLOWED! We mutated the contents in the Heap.
+player.score = 500; // ALLOWED! We added a property in the Heap.
+
+player = { level: 3 }; // TypeError: Assignment to constant variable.
 ```
+- **The Explanation:** `const` locks the **Stack memory slot**. The stack slot contains the reference pointer address (e.g., `#0x7A4F`). As long as that pointer address does not change, `const` is satisfied. Mutating properties modifies the memory inside the Heap, leaving the pointer on the Stack untouched!
+
+##### 5. Non-Primitives Mastery: Objects & Arrays
+- **Objects (The Contact Card):** Group related key-value properties.
+  - Access via dot notation (`user.name`) when key is known.
+  - Access via bracket notation (`user["first-name"]` or `user[dynamicVariable]`) when keys contain special characters or variables.
+  - Add (`user.age = 30`), modify (`user.age = 31`), and delete (`delete user.age`).
+- **Arrays (The Ice Cube Tray):** Ordered, numbered lists starting at index `0`.
+  - Properties & Methods:
+    - `.length`: Total number of elements.
+    - `.at(-1)`: Access the last item safely without `arr[arr.length - 1]`.
+    - Mutating methods: `.push(item)` (add to end), `.pop()` (remove from end), `.unshift(item)` (add to front), `.shift()` (remove from front).
+    - Querying methods: `.includes(item)` (returns boolean), `.indexOf(item)` (returns index or -1), `.slice(start, end)` (returns a safe copy of a slice).
+- **Arrays of Objects (The Universal Web Data Shape):**
+  ```javascript
+  const products = [
+    { id: 1, title: "Mechanical Keyboard", price: 120, inStock: true },
+    { id: 2, title: "Wireless Mouse",      price: 60,  inStock: false },
+    { id: 3, title: "USB-C Monitor Hub",   price: 85,  inStock: true }
+  ];
+
+  let totalValue = 0;
+  for (const item of products) {
+    if (item.inStock) {
+      totalValue += item.price;
+    }
+  }
+  console.log(`In-stock inventory value: $${totalValue}`);
+  ```
+
+##### 6. JavaScript Operators Encyclopedia
+1. **Arithmetic:** `+`, `-`, `*`, `/`, `%` (remainder/modulo), `**` (exponentiation).
+   - *String Concatenation:* `"User: " + 42` yields `"User: 42"`. Always prefer template literals (`` `User: ${id}` ``).
+   - *`NaN` (Not a Number):* Result of invalid numeric math (e.g., `"apple" * 3`). Any math with `NaN` yields `NaN`.
+2. **Assignment:** `=` (assign), `+=`, `-=`, `*=`, `/=`.
+3. **Comparison:**
+   - **Strict Equality (`===`) & Strict Inequality (`!==`):** Compares both value AND data type without coercion. *Always use strict equality in production!*
+   - **Loose Equality (`==`):** Coerces types implicitly (e.g., `0 == ""` is `true`, `null == undefined` is `true`). *Forbidden in modern JavaScript.*
+   - **Equality for Non-Primitives:** Non-primitives compare **memory addresses**, NOT contents. That is why `{} === {}` and `[] === []` are always `false`!
+4. **Logical Operators & Short-Circuit Evaluation:**
+   - **`||` (OR) = The Fallback Operator:** Scans left to right for the *first truthy* value. Used for default values:
+     ```javascript
+     const username = inputName || "Anonymous";
+     ```
+   - **`&&` (AND) = The Gatekeeper Operator:** Scans left to right for the *first falsy* value. Used for guard execution:
+     ```javascript
+     const canAccess = isLoggedIn && hasPermission;
+     ```
+   - **`!` (NOT):** Inverts boolean truth. Double NOT (`!!value`) casts any value to a strict boolean.
+
+##### 7. Control Flow: Conditionals, Truthy/Falsy & Guard Clauses
+JavaScript evaluates conditions in `if`, `while`, and ternary expressions by converting them into booleans.
+
+**The 8 Falsy Values in JavaScript:**
+Any value that is NOT one of these 8 is automatically **truthy**:
+1. `false`
+2. `0`
+3. `-0`
+4. `0n` (BigInt zero)
+5. `""` (Empty string)
+6. `null`
+7. `undefined`
+8. `NaN`
+
+*(Note: Empty arrays `[]` and empty objects `{}` are TRUTHY because they are allocated non-primitive references in the Heap!)*
+
+**The Ternary Operator (`? :`):**
+A concise inline alternative to simple `if/else` assignments:
+```javascript
+const statusLabel = user.isActive ? "Online" : "Away";
+```
+
+**Clean Code: The Guard Clause Pattern**
+Avoid deeply nested "Pyramids of Doom" by checking error cases at the top:
+```javascript
+// ✅ PREFERRED: Linear Guard Clauses
+if (!order) {
+  console.log("Invalid order");
+} else if (order.items.length === 0) {
+  console.log("Cart is empty");
+} else if (!order.isPaid) {
+  console.log("Payment required");
+} else {
+  console.log("Order processing successfully");
+}
+```
+
+##### 8. Control Flow: Iteration Mechanics (Loops)
+Loops automate repetitive operations, adhering to the **DRY (Don't Repeat Yourself)** principle.
+
+1. **The Classic `for` Loop:**
+   ```javascript
+   for (let i = 0; i < 5; i++) {
+     console.log(`Step ${i}`);
+   }
+   ```
+2. **The `while` Loop:**
+   Best when the number of iterations is unknown in advance:
+   ```javascript
+   let attempts = 0;
+   while (attempts < 3) {
+     attempts++;
+   }
+   ```
+3. **Loop Control: `break` vs. `continue`:**
+   - `break`: Terminates the entire loop immediately and exits.
+   - `continue`: Skips the remainder of the current iteration and jumps directly to the next step.
+4. **Modern Traversal for Collections:**
+   - **`for...of` (For Arrays):**
+     ```javascript
+     const colors = ["Red", "Green", "Blue"];
+     for (const color of colors) {
+       console.log(color);
+     }
+     ```
+   - **`Object.entries()` (For Objects):**
+     ```javascript
+     const car = { make: "Toyota", year: 2024 };
+     for (const [key, value] of Object.entries(car)) {
+       console.log(`${key}: ${value}`);
+     }
+     ```
 
 #### 3. 10-Minute Syntax & Concept Drill
-**Fill in the missing punctuation (commas, colons, curly braces, brackets):**
+
+##### Drill 1: Predict the Memory Output
 ```javascript
-// A profile object:
-const instructor = __
-  name__: "Dr. Smith",
-  department: "Computer Science"__
-  isActive: true
-__;
+let x = { val: 5 };
+let y = x;
+y.val = 15;
+let z = { ...x };
+z.val = 25;
 
-// Access the department:
-console.log(instructor.__);
+console.log(x.val); // ?
+console.log(z.val); // ?
 ```
-*(Answers: `{`, `:`, `,`, `}`, `department`)*
+*(Answers: `15` [because `y` and `x` share the same reference], `25` [because `z` is a spread clone])*
 
-#### 4. Hands-on Lab: Modeling an E-Commerce Product Catalog (55 min)
-1. Create `data.js`.
-2. Construct an array of 3 product objects. Each product must have:
-   - `id` (Number)
-   - `title` (String)
-   - `price` (Number)
-   - `inStock` (Boolean)
-   - `tags` (Array of Strings)
-3. Practice queries in the Console:
-   - Print the title of the first product.
-   - Print the second tag of the third product.
-   - Update `inStock` of product 1 from `true` to `false`.
-4. Run a live check-in: call the instructor over to inspect your console queries.
+##### Drill 2: Strict vs. Loose Equality
+```javascript
+console.log(0 == false);        // ?
+console.log(0 === false);       // ?
+console.log([] == false);       // ?
+console.log([] === []);         // ?
+console.log(null === undefined);// ?
+```
+*(Answers: `true`, `false`, `true`, `false`, `false`)*
+
+##### Drill 3: Short-Circuit Prediction
+```javascript
+console.log("" || "Guest");       // ?
+console.log("Admin" || "Guest");   // ?
+console.log(false && "Ignored");   // ?
+console.log(true && "Approved");   // ?
+```
+*(Answers: `"Guest"`, `"Admin"`, `false`, `"Approved"`)*
+
+#### 4. Hands-on Lab: The E-Commerce Cart & Discount Engine (50 min)
+
+##### Sprint 1: Memory & Reference Verification (15 min)
+1. Open the Browser Console (`Cmd + Option + J` or `F12`).
+2. Create a master catalog object:
+   ```javascript
+   const catalogItem = { id: 101, name: "Noise-Cancelling Headphones", price: 199.99 };
+   ```
+3. Test reference mutation:
+   - Assign `const cartItem = catalogItem;`
+   - Mutate `cartItem.price = 9.99;`
+   - Inspect `catalogItem.price`. Notice that your store catalog has been corrupted!
+   - Fix the bug by re-creating `catalogItem` and using safe cloning: `const safeCartItem = { ...catalogItem };`
+
+##### Sprint 2: Cart Array Modeling & Total Calculation (20 min)
+1. Create a `cart` array containing 3 product objects with `id`, `name`, `price`, and `quantity`.
+2. Write a `for...of` loop to iterate through the array:
+   - Accumulate `price * quantity` for each item into a `subtotal` variable.
+   - Print the final subtotal.
+
+##### Sprint 3: Discount & Rule Processing (15 min)
+1. Create discount variables: `couponCode = "SAVE10"`, `isMember = true`.
+2. Use an `if/else` ladder or ternary to apply discounts:
+   - If `couponCode === "SAVE10"`, subtract 10% from the subtotal.
+   - If `isMember`, give free shipping ($0), otherwise add $15 shipping fee using the ternary operator.
+   - Print the final checkout summary.
 
 #### 5. AI Tutor Challenge (10 min)
 Prompt your AI tutor:
-> *"I have an array of objects. How do I know whether to use square brackets `[]` or dot notation `.` when extracting data? Give me a 2-step decision rule."*
+> *"I have two JavaScript variables holding objects: `const a = { role: 'admin' }; const b = { role: 'admin' };`. Explain to me as if I am 12 years old why `a === b` evaluates to false, but `a.role === b.role` evaluates to true. Use the labeled box and house address metaphor."*
 
 ---
 
